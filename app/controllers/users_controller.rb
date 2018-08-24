@@ -10,6 +10,9 @@ class UsersController < ApplicationController
   end
 
   def show
+    @user = User.find(params[:id])
+    @microposts = @user.microposts.order('created_at DESC').page(params[:page])
+    counts(@user)
   end
 
   def new
@@ -20,12 +23,13 @@ class UsersController < ApplicationController
     @user = User.new(user_params)
 
     if @user.save
-      ## ここ
+      # flashはハッシュで出来ている、|key, value| のペアで取り出す
+      # HTTP リクエストを発生させるので flash.now だと内容を保持できずに消える
       flash[:success] = 'ユーザを登録しました。'
       # 処理を users#show のアクションへと強制的に移動
       redirect_to @user
     else
-      ## ここ
+      # HTTP リクエストを発生させないので flash.now が消えない
       flash.now[:danger] = 'ユーザの登録に失敗しました。'
       # 単に users/new.html.erb を表示
       render :new
@@ -34,7 +38,10 @@ class UsersController < ApplicationController
 
   private
 
+  # Strong Parameter
   def user_params
+    # params.require(:user) で User モデルのフォームから得られるデータに関するものだと明示
+    #.permit(:content) で必要なカラムだけを選択
     # password から暗号化され password_digest として保存
     # password_confirmation は password の確認のために使用
     params.require(:user).permit(:name, :email, :password, :password_confirmation)

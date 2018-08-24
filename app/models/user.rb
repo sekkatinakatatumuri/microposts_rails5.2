@@ -15,4 +15,7 @@ class User < ApplicationRecord
   
   # ログイン認証のための準備(暗号化のために bcrypt Gem が必要)
   has_secure_password
+  
+  # User と Micropost の多側を表現(手動)
+  has_many :microposts
 end
