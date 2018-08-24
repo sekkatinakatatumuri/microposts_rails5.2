@@ -1,4 +1,7 @@
 class UsersController < ApplicationController
+  # only: で指定されたアクションに対して、事前処理を設定
+  before_action :require_user_logged_in, only: [:index, :show]
+  
   def index
     # UserモデルはRailsによって自動的にrequireされる
     # コード中に不明なクラスが登場すると特定のパスから条件に合致しそうなクラスを見つけ、
