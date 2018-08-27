@@ -16,6 +16,7 @@ class MicropostsController < ApplicationController
   end
 
   def destroy
+    @micropost = Micropost.find(params[:id])
     @micropost.destroy
     flash[:success] = 'メッセージを削除しました。'
     # redirect_back は、アクションが実行されたページに戻る
