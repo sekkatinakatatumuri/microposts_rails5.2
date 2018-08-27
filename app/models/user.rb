@@ -18,4 +18,30 @@ class User < ApplicationRecord
   
   # User と Micropost の多側を表現(手動)
   has_many :microposts
+  # User が Relationship(中間テーブル) と一対多である関係
+  has_many :relationships
+  # 中間テーブルから先のモデルを参照してくれるので、 User から直接、多対多の User 達を取得
+  has_many :followings, through: :relationships, source: :follow
+  # Railsの命名規則に沿っていない逆方向では必要なオプション
+  has_many :reverses_of_relationship, class_name: 'Relationship', foreign_key: 'follow_id'
+  has_many :followers, through: :reverses_of_relationship, source: :user
+  
+  # フォロー
+  def follow(other_user)
+    # 自分自身ではないか
+    unless self == other_user
+      self.relationships.find_or_create_by(follow_id: other_user.id)
+    end
+  end
+  
+  # アンフォロー
+  def unfollow(other_user)
+    relationship = self.relationships.find_by(follow_id: other_user.id)
+    relationship.destroy if relationship
+  end
+  
+  # 既にフォローしているか？
+  def following?(other_user)
+    self.followings.include?(other_user)
+  end
 end
