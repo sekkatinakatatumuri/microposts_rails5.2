@@ -44,4 +44,11 @@ class User < ApplicationRecord
   def following?(other_user)
     self.followings.include?(other_user)
   end
+  
+  # タイムライン
+  def feed_microposts
+    # following_ids は User がフォローしている User の id の配列を取得
+    # 自分自身の self.id もデータ型を合わせるために [self.id] と配列に変換して追加
+    Micropost.where(user_id: self.following_ids + [self.id])
+  end
 end
